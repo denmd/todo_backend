@@ -4,6 +4,7 @@ const Project = require('../models/projects');
 const Todo = require('../models/todo');
 const User = require('../models/User');
 const VerifyToken = require('../middleware/verifytoken');
+const verifyToken = require('../middleware/verifytoken');
 
 
 
@@ -99,5 +100,50 @@ router.delete('/remove-todo', VerifyToken, async (req, res) => {
         res.status(500).json(console.log(error));
     }
 });
+router.get('/nos', VerifyToken, async (req, res) => {
+   
+    const { projectId } = req.query; 
+    const {status}=req.query;
+   
+
+    try {
+        const project = await Project.findById(projectId).populate('todos');
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+
+        const todoobjs=[]
+        project.todos.map(todoID=>{
+             const Todolist=  Todo.findById(todoID)
+             todoobjs.push(Todolist) 
+        })
+        const cno = todoobjs.filter(todo=>todo.status === status).length
+        res.status(200).json({ no });
+        
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
+// colloboratore routes
+
+
+router.get('/search-users',VerifyToken, async (req,res)=>{
+
+    const { username }=req.query;
+    console.log(username)
+    try{
+      
+        const users = await User.find({username: new RegExp(username, 'i')})
+        res.json({users});
+    }
+    catch(error){
+        console.error('error seraching users');
+        res.status(500).json({ error: 'Internal server error' });
+
+    }
+    
+
+})
 
 module.exports = router;

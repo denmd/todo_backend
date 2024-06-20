@@ -37,6 +37,11 @@ router.get('/get-projects',VerifyToken , async (req, res) => {
         }
 
         const projects = await Project.find({ _id: { $in: user.projects } });
+       
+       
+        
+      
+        console.log()
         res.json(projects);
     } catch (error) {
         res.status(500).json({ message: error.message });
